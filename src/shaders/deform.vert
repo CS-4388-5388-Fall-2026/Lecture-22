@@ -20,6 +20,10 @@ in vec3 normal;
 in vec4 color;
 in vec2 texCoord;
 
+// animation data
+uniform float waveAngle;
+uniform float waveScale;
+
 // data we want to send to the rasterizer and eventually the fragment shader
 out vec3 vertPositionWorld;
 out vec3 vertNormalWorld;

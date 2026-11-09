@@ -34,6 +34,10 @@ uniform float shininess;
 uniform int useTexture;
 uniform sampler2D textureImage;
 
+// animation data
+uniform float waveAngle;
+uniform float waveScale;
+
 // data passed in from the vertex shader
 in vec3 vertPositionWorld;
 in vec3 vertNormalWorld;

@@ -9,22 +9,24 @@
 // you are planning to add wizard functionality.
 
 // @ts-ignore
-import phongVertexShader from './shaders/myphong.vert'
+import vertexShader from './shaders/deform.vert'
 // @ts-ignore
-import phongFragmentShader from './shaders/myphong.frag'
+import fragmentShader from './shaders/deform.frag'
 
 import * as gfx from 'gophergfx'
 
 
-export class MyPhongMaterial extends gfx.Material3
+export class DeformMaterial extends gfx.Material3
 {
     public texture: gfx.Texture | null;
     public ambientColor: gfx.Color;
     public diffuseColor: gfx.Color;
     public specularColor: gfx.Color;
     public shininess: number;
+    public waveScale: number;
+    public waveAngle: number;
 
-    public static shader = new gfx.ShaderProgram(phongVertexShader, phongFragmentShader);
+    public static shader = new gfx.ShaderProgram(vertexShader, fragmentShader);
 
     private kAmbientUniform: WebGLUniformLocation | null;
     private kDiffuseUniform: WebGLUniformLocation | null;
@@ -52,6 +54,9 @@ export class MyPhongMaterial extends gfx.Material3
     private colorAttribute: number;
     private texCoordAttribute: number;
 
+    private waveScaleUniform: WebGLUniformLocation | null;
+    private waveAngleUniform: WebGLUniformLocation | null;
+
     constructor()
     {
         super();
@@ -61,34 +66,39 @@ export class MyPhongMaterial extends gfx.Material3
         this.diffuseColor = new gfx.Color(1, 1, 1);
         this.specularColor = new gfx.Color(0, 0, 0);
         this.shininess = 30;
+        this.waveAngle = 0;
+        this.waveScale = 1;
 
-        MyPhongMaterial.shader.initialize(this.gl);
+        DeformMaterial.shader.initialize(this.gl);
 
-        this.kAmbientUniform = MyPhongMaterial.shader.getUniform(this.gl, 'kAmbient');
-        this.kDiffuseUniform = MyPhongMaterial.shader.getUniform(this.gl, 'kDiffuse');
-        this.kSpecularUniform = MyPhongMaterial.shader.getUniform(this.gl, 'kSpecular');
-        this.shininessUniform = MyPhongMaterial.shader.getUniform(this.gl, 'shininess');
+        this.kAmbientUniform = DeformMaterial.shader.getUniform(this.gl, 'kAmbient');
+        this.kDiffuseUniform = DeformMaterial.shader.getUniform(this.gl, 'kDiffuse');
+        this.kSpecularUniform = DeformMaterial.shader.getUniform(this.gl, 'kSpecular');
+        this.shininessUniform = DeformMaterial.shader.getUniform(this.gl, 'shininess');
 
-        this.textureUniform = MyPhongMaterial.shader.getUniform(this.gl, 'textureImage');
-        this.useTextureUniform = MyPhongMaterial.shader.getUniform(this.gl, 'useTexture');
+        this.textureUniform = DeformMaterial.shader.getUniform(this.gl, 'textureImage');
+        this.useTextureUniform = DeformMaterial.shader.getUniform(this.gl, 'useTexture');
 
-        this.modelUniform = MyPhongMaterial.shader.getUniform(this.gl, 'modelMatrix');
-        this.normalUniform = MyPhongMaterial.shader.getUniform(this.gl, 'normalMatrix');
-        this.viewUniform = MyPhongMaterial.shader.getUniform(this.gl, 'viewMatrix');
-        this.projectionUniform = MyPhongMaterial.shader.getUniform(this.gl, 'projectionMatrix');
+        this.modelUniform = DeformMaterial.shader.getUniform(this.gl, 'modelMatrix');
+        this.normalUniform = DeformMaterial.shader.getUniform(this.gl, 'normalMatrix');
+        this.viewUniform = DeformMaterial.shader.getUniform(this.gl, 'viewMatrix');
+        this.projectionUniform = DeformMaterial.shader.getUniform(this.gl, 'projectionMatrix');
 
-        this.eyePositionWorldUniform = MyPhongMaterial.shader.getUniform(this.gl, 'eyePositionWorld');
-        this.numLightsUniform = MyPhongMaterial.shader.getUniform(this.gl, 'numLights');
-        this.lightTypesUniform = MyPhongMaterial.shader.getUniform(this.gl, 'lightTypes');
-        this.lightPositionsWorldUniform = MyPhongMaterial.shader.getUniform(this.gl, 'lightPositionsWorld');
-        this.ambientIntensitiesUniform = MyPhongMaterial.shader.getUniform(this.gl, 'ambientIntensities');
-        this.diffuseIntensitiesUniform = MyPhongMaterial.shader.getUniform(this.gl, 'diffuseIntensities');
-        this.specularIntensitiesUniform = MyPhongMaterial.shader.getUniform(this.gl, 'specularIntensities');
+        this.eyePositionWorldUniform = DeformMaterial.shader.getUniform(this.gl, 'eyePositionWorld');
+        this.numLightsUniform = DeformMaterial.shader.getUniform(this.gl, 'numLights');
+        this.lightTypesUniform = DeformMaterial.shader.getUniform(this.gl, 'lightTypes');
+        this.lightPositionsWorldUniform = DeformMaterial.shader.getUniform(this.gl, 'lightPositionsWorld');
+        this.ambientIntensitiesUniform = DeformMaterial.shader.getUniform(this.gl, 'ambientIntensities');
+        this.diffuseIntensitiesUniform = DeformMaterial.shader.getUniform(this.gl, 'diffuseIntensities');
+        this.specularIntensitiesUniform = DeformMaterial.shader.getUniform(this.gl, 'specularIntensities');
 
-        this.positionAttribute = MyPhongMaterial.shader.getAttribute(this.gl, 'position');
-        this.normalAttribute = MyPhongMaterial.shader.getAttribute(this.gl, 'normal');
-        this.colorAttribute = MyPhongMaterial.shader.getAttribute(this.gl, 'color');
-        this.texCoordAttribute = MyPhongMaterial.shader.getAttribute(this.gl, 'texCoord');   
+        this.positionAttribute = DeformMaterial.shader.getAttribute(this.gl, 'position');
+        this.normalAttribute = DeformMaterial.shader.getAttribute(this.gl, 'normal');
+        this.colorAttribute = DeformMaterial.shader.getAttribute(this.gl, 'color');
+        this.texCoordAttribute = DeformMaterial.shader.getAttribute(this.gl, 'texCoord');   
+
+        this.waveAngleUniform = DeformMaterial.shader.getUniform(this.gl, 'waveAngle');
+        this.waveScaleUniform = DeformMaterial.shader.getUniform(this.gl, 'waveScale');
     }
 
     draw(mesh: gfx.Mesh3, camera: gfx.Camera, lightManager: gfx.LightManager): void
@@ -99,7 +109,7 @@ export class MyPhongMaterial extends gfx.Material3
         this.initialize();
 
         // Switch to this shader
-        this.gl.useProgram(MyPhongMaterial.shader.getProgram());
+        this.gl.useProgram(DeformMaterial.shader.getProgram());
 
         // Set the camera and model matrix uniforms
         const modelMatrix = mesh.localToWorldMatrix;
@@ -124,6 +134,9 @@ export class MyPhongMaterial extends gfx.Material3
         this.gl.uniform3fv(this.ambientIntensitiesUniform, lightManager.ambientIntensities);
         this.gl.uniform3fv(this.diffuseIntensitiesUniform, lightManager.diffuseIntensities);
         this.gl.uniform3fv(this.specularIntensitiesUniform, lightManager.specularIntensities);
+
+        this.gl.uniform1f(this.waveAngleUniform, this.waveAngle);
+        this.gl.uniform1f(this.waveScaleUniform, this.waveScale);
 
         // Set the vertex positions
         this.gl.enableVertexAttribArray(this.positionAttribute);
