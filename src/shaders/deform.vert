@@ -20,10 +20,6 @@ in vec3 normal;
 in vec4 color;
 in vec2 texCoord;
 
-// animation data
-uniform float waveAngle;
-uniform float waveScale;
-
 // data we want to send to the rasterizer and eventually the fragment shader
 out vec3 vertPositionWorld;
 out vec3 vertNormalWorld;
@@ -33,8 +29,7 @@ out vec2 uv;
 void main() 
 {
     // position in homogenous coords is x, y, z, 1
-    vec3 vertPositionDeformed = position + (cos(position.x*20.0 + waveAngle) * 0.5 + 0.5) * waveScale * normal;
-    vertPositionWorld = (modelMatrix * vec4(vertPositionDeformed, 1)).xyz;
+    vertPositionWorld = (modelMatrix * vec4(position, 1)).xyz;
 
     // vector in homogenous coords is x, y, z, 0
     vertNormalWorld = normalize((normalMatrix * vec4(normal, 0)).xyz);
