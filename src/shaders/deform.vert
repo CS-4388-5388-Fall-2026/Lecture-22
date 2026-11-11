@@ -1,9 +1,9 @@
 #version 300 es
 
 /* Lecture 22: Advanced Shader Programming
- * CS 4388/ CS 5388, Fall 2026, Texas State University
+ * CS 4388/ CS 5388, Fall 2025, Texas State University
  * Instructor: Isayas Berhe Adhanom <isayas@txstate.edu>
- * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.  Adapted from the original work by Dr. Evan Suma Rosenberg, University of Minnesota.
+ * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
  */ 
 
 precision mediump float;
@@ -33,7 +33,8 @@ out vec2 uv;
 void main() 
 {
     // position in homogenous coords is x, y, z, 1
-    vertPositionWorld = (modelMatrix * vec4(position, 1)).xyz;
+    vec3 vertPositionDeformed = position + (cos(position.x*20.0 + waveAngle) * 0.5 + 0.5) * waveScale * normal;
+    vertPositionWorld = (modelMatrix * vec4(vertPositionDeformed, 1)).xyz;
 
     // vector in homogenous coords is x, y, z, 0
     vertNormalWorld = normalize((normalMatrix * vec4(normal, 0)).xyz);

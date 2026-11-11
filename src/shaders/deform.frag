@@ -1,9 +1,9 @@
 #version 300 es
 
 /* Lecture 22: Advanced Shader Programming
- * CS 4388/ CS 5388, Fall 2026, Texas State University
+ * CS 4388/ CS 5388, Fall 2025, Texas State University
  * Instructor: Isayas Berhe Adhanom <isayas@txstate.edu>
- * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.  Adapted from the original work by Dr. Evan Suma Rosenberg, University of Minnesota.
+ * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
  */ 
 
 precision mediump float;
@@ -46,7 +46,10 @@ out vec4 fragColor;
 void main() 
 {
     // Normalize the interpolated normal vector
-    vec3 n = normalize(vertNormalWorld);
+    //https://www.aclockworkberry.com/shader-derivative-functions/
+    vec3 n = normalize(cross(dFdx(vertPositionWorld), dFdy(vertPositionWorld)));
+
+
 
     // light calculations
     vec3 illumination = vec3(0, 0, 0);

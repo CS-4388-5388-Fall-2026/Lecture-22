@@ -1,9 +1,9 @@
 #version 300 es
 
 /* Lecture 22: Advanced Shader Programming
- * CS 4388/ CS 5388, Fall 2026, Texas State University
+ * CS 4388/ CS 5388, Fall 2025, Texas State University
  * Instructor: Isayas Berhe Adhanom <isayas@txstate.edu>
- * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.  Adapted from the original work by Dr. Evan Suma Rosenberg, University of Minnesota.
+ * License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
  */ 
 
 precision mediump float;
@@ -67,8 +67,9 @@ void main()
             l = normalize(lightPositionsWorld[i]); 
 
         // Diffuse component
+        float waveFactor = cos((vertPositionWorld.x + vertPositionWorld.y) * waveScale + waveAngle) * 0.5 + 0.5;
         float diffuseComponent = max(dot(n, l), 0.0);
-        illumination += diffuseComponent * kDiffuse * diffuseIntensities[i];
+        illumination += waveFactor * diffuseComponent * kDiffuse * diffuseIntensities[i];
 
         // Compute the vector from the vertex to the eye
         vec3 e = normalize(eyePositionWorld - vertPositionWorld);

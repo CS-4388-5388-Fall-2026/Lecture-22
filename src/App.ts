@@ -147,6 +147,10 @@ export class App extends gfx.GfxApp
     {
         // Update the camera controller
         this.cameraControls.update(deltaTime);
+
+        this.waveMaterial.waveAngle += Math.PI * deltaTime;
+
+        this.deformMaterial.waveAngle += Math.PI * deltaTime;
        
     }
 
