@@ -32,8 +32,33 @@ out vec2 uv;
 
 void main() 
 {
+    
+      int mode = 1;   // 0 = original, 1 = radial ripple, 2 = fading ripple, 3 = sharp pulses, 4 = twist
+
     // position in homogenous coords is x, y, z, 1
-    vec3 vertPositionDeformed = position + (cos(position.x*20.0 + waveAngle) * 0.5 + 0.5) * waveScale * normal;
+    vec3 vertPositionDeformed;
+
+    if (mode == 1)
+        // Radial ripple
+        vertPositionDeformed = position + (sin(length(position.xz) * 40.0 - waveAngle) * 0.5 + 0.5) * waveScale * normal;
+    else if (mode == 2)
+        // Ripple that fades with distance
+        vertPositionDeformed = position + (sin(length(position.xz) * 40.0 - waveAngle) * 0.5 + 0.5) * exp(-3.0 * length(position.xz)) * waveScale * normal;
+    else if (mode == 3)
+        // Sharp pulses
+        vertPositionDeformed = position + pow(cos(position.x * 20.0 + waveAngle) * 0.5 + 0.5, 8.0) * waveScale * normal;
+    else if (mode == 4)
+    {
+        // Twist around the vertical axis
+        float a = position.y * 3.0 * sin(waveAngle);
+        vertPositionDeformed = vec3(position.x * cos(a) - position.z * sin(a), position.y, position.x * sin(a) + position.z * cos(a));
+    }
+    else
+        // Original
+        vertPositionDeformed = position + (cos(position.x*20.0 + waveAngle) * 0.5 + 0.5) * waveScale * normal;
+
+    
+    // position in homogenous coords is x, y, z, 1
     vertPositionWorld = (modelMatrix * vec4(vertPositionDeformed, 1)).xyz;
 
     // vector in homogenous coords is x, y, z, 0
